@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSync AI - Student Portal & AI Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-student: #ffffff;
+            --accent-glow: rgba(255, 255, 255, 0.15);
+            --status-success: #10b981;
+            --status-warning: #f59e0b;
+            --status-danger: #ef4444;
+            --ai-accent: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+        }
+
+        header {
+            padding: 1.25rem 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--card-border);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f172a;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .stat-sub {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .status-safe { color: var(--status-success); }
+        .status-warn { color: var(--status-warning); }
+        .status-alert { color: var(--status-danger); }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        /* AI Assistant Drawer Sidebar */
+        .ai-sidebar {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            position: sticky;
+            top: 90px;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .ai-pulse {
+            width: 10px;
+            height: 10px;
+            background-color: var(--ai-accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--ai-accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .chat-bubble.ai {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-bubble.user {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--card-border);
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .quick-prompts {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.35rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prompt-chip:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.4rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.88rem;
+        }
+
+        .send-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <i class="fa-solid fa-graduation-cap"></i> EduSync AI
+            <span class="brand-badge">Class 12 Commerce</span>
+        </div>
+        <div class="user-profile">
+            <div style="text-align: right;">
+                <div style="font-size: 0.88rem; font-weight: 600;">Alex Morgan</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">M02041 • Student (Under 18)</div>
+            </div>
+            <div class="avatar">AM</div>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- Main Dashboard Area -->
+        <section class="main-content">
+            <!-- Analytics Cards -->
+            <div class="dashboard-grid">
+                <div class="glass-card stat-card">
+                    <div class="stat-title">Attendance Level</div>
+                    <div class="stat-value status-safe" id="attn-pct">88.2%</div>
+                    <div class="stat-sub status-safe"><i class="fa-solid fa-circle-check"></i> Meets 85% requirement</div>
+                </div>
+
+                <div class="glass-card stat-card">
+                    <div class="stat-title">Attendance Record</div>
+                    <div class="stat-value">60 / 68</div>
+                    <div class="stat-sub" style="color: var(--text-secondary);">8 Days Absent • 2 Late</div>
+                </div>
+
+                <div class="glass-card stat-card">
+                    <div class="stat-title">Pending Tasks</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-sub status-warn"><i class="fa-solid fa-clock"></i> Accounts Due Tomorrow</div>
+                </div>
+            </div>
+
+            <!-- Homework & Syllabus -->
+            <div class="glass-card" style="margin-bottom: 1.5rem;">
+                <div class="section-title"><i class="fa-solid fa-book"></i> Active Homework Assignments</div>
+                <div class="list-item">
+                    <div>
+                        <strong>Accountancy:</strong> Partnership Cash Flow Calculations
+                        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">Due: Tomorrow, 11:59 PM</div>
+                    </div>
+                    <span class="brand-badge" style="color: var(--status-warning);">Pending</span>
+                </div>
+                <div class="list-item">
+                    <div>
+                        <strong>Business Studies:</strong> Principles of Management Essay
+                        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">Due: Aug 10, 2026</div>
+                    </div>
+                    <span class="brand-badge" style="color: var(--status-success);">In Progress</span>
+                </div>
+            </div>
+
+            <!-- Recent Teacher Remarks -->
+            <div class="glass-card">
+                <div class="section-title"><i class="fa-solid fa-comment-dots"></i> Teacher Remarks</div>
+                <div class="list-item">
+                    <div>
+                        <strong>Economics (Mr. Vance):</strong> "Excellent active participation during macroeconomic policy discussion."
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Posted yesterday</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Assistant Sidebar -->
+        <aside class="glass-card ai-sidebar">
+            <div class="ai-header">
+                <div class="ai-pulse"></div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.95rem;">EduSync Assistant</div>
+                    <div style="font-size: 0.72rem; color: var(--text-secondary);">Real-Time Academic & Status AI</div>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chat-box">
+                <div class="chat-bubble ai">
+                    Hello Alex! I am your EduSync Assistant. You can ask me about your attendance, homework status, leave guidelines, or exam syllabus.
+                </div>
+            </div>
+
+            <div class="quick-prompts">
+                <button class="prompt-chip" onclick="askAI('What is my attendance status?')">Attendance?</button>
+                <button class="prompt-chip" onclick="askAI('How to submit medical leave?')">Sick Leave Rules</button>
+                <button class="prompt-chip" onclick="askAI('Am I above 85% attendance?')">Check 85% Threshold</button>
+            </div>
+
+            <div class="chat-input-wrapper">
+                <input type="text" id="user-input" class="chat-input" placeholder="Ask about status, leaves, homework..." onkeypress="handleKey(event)" />
+                <button class="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        // Student State Data
+        const studentData = {
+            name: "Alex Morgan",
+            admissionNo: "M02041",
+            ageGroup: "Under 18 (Minor)",
+            attendancePct: 88.2,
+            totalClasses: 68,
+            presentDays: 60,
+            absentDays: 8,
+            lateArrivals: 2,
+            requiredPct: 85.0,
+            homework: [
+                { subject: "Accountancy", task: "Partnership Cash Flow Calculations", due: "Tomorrow" },
+                { subject: "Business Studies", task: "Principles of Management Essay", due: "Aug 10, 2026" }
+            ]
+        };
+
+        function sendMessage() {
+            const inputEl = document.getElementById('user-input');
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            appendBubble(text, 'user');
+            inputEl.value = '';
+
+            setTimeout(() => {
+                const response = generateAIResponse(text);
+                appendBubble(response, 'ai');
+            }, 400);
+        }
+
+        function askAI(questionText) {
+            document.getElementById('user-input').value = questionText;
+            sendMessage();
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function appendBubble(text, sender) {
+            const box = document.getElementById('chat-box');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${sender}`;
+            bubble.innerHTML = text;
+            box.appendChild(bubble);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // Lightweight Natural Language Rule Engine for Student Assistant
+        function generateAIResponse(query) {
+            const q = query.toLowerCase();
+
+            if (q.includes('attendance') || q.includes('status') || q.includes('absent') || q.includes('present')) {
+                const margin = (studentData.attendancePct - studentData.requiredPct).toFixed(1);
+                return `Your overall attendance is <strong>${studentData.attendancePct}%</strong> (${studentData.presentDays}/${studentData.totalClasses} days). You are currently <strong>${margin}% above</strong> the required 85% minimum threshold. You have 2 late arrivals logged.`;
+            }
+
+            if (q.includes('85') || q.includes('threshold') || q.includes('detained') || q.includes('warning')) {
+                if (studentData.attendancePct >= 85) {
+                    return `You meet the standard! Your attendance is <strong>${studentData.attendancePct}%</strong>, which satisfies the mandatory 85% requirement. Keep it up to avoid administrative warnings.`;
+                } else {
+                    return `⚠️ Warning: Your attendance is below 85%. You need to attend upcoming classes consistently or submit medical proof for past absences.`;
+                }
+            }
+
+            if (q.includes('leave') || q.includes('sick') || q.includes('medical') || q.includes('doctor')) {
+                return `<strong>Leave Application Policy (Under 18):</strong><br>• For normal leaves, submit dates via the Leave Portal.<br>• For <strong>Sick Leave</strong>, uploading a valid medical prescription/certificate is mandatory under school policy. Admin approval takes 24 hours.`;
+            }
+
+            if (q.includes('homework') || q.includes('assignment') || q.includes('due') || q.includes('task')) {
+                return `You have 2 pending assignments:<br>1. <strong>Accountancy:</strong> Partnership Cash Flow (Due: Tomorrow)<br>2. <strong>Business Studies:</strong> Management Essay (Due: Aug 10, 2026)`;
+            }
+
+            if (q.includes('complaint') || q.includes('issue') || q.includes('report')) {
+                return `You can submit complaints or feedback confidentially through the Student Complaints section. Your entry will be reviewed by the School Administrator.`;
+            }
+
+            if (q.includes('hi') || q.includes('hello') || q.includes('hey')) {
+                return `Hello Alex! How can I assist you with your academic status or school updates today?`;
+            }
+
+            return `I can assist you with details regarding your <strong>attendance record</strong>, <strong>homework due dates</strong>, <strong>medical leave requirements</strong>, or <strong>85% attendance status</strong>. Try asking: "What is my attendance?" or "How to submit medical leave?"`;
+        }
+    </script>
+</body>
+</html>
