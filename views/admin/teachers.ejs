@@ -1,0 +1,36 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Manage Teachers</h2><p>Issue login codes for teacher accounts.</p></div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-label">Add Teacher</div>
+    <form method="POST" action="/admin/teachers">
+      <div class="field"><label>Full Name</label><input name="name" placeholder="Teacher name"></div>
+      <div class="field"><label>Teacher Code</label><input name="code" class="mono" placeholder="e.g. TCH-3305" style="text-transform:uppercase;"></div>
+      <div class="field"><label>Classes (comma-separated, optional)</label><input name="classes" placeholder="e.g. 11th Commerce, 11th Science A"></div>
+      <button class="btn" type="submit">Add Teacher</button>
+      <% if (error) { %><div class="err-msg"><%= error %></div><% } %>
+      <div class="hint">The code is shown once below after creation — write it down for the teacher.</div>
+    </form>
+  </div>
+  <div class="card">
+    <div class="section-label">All Teachers (<%= list.length %>)</div>
+    <% if (!list.length) { %>
+      <div class="empty-state">No teachers added yet.</div>
+    <% } else { %>
+      <table>
+        <tr><th>Name</th><th>Code</th><th>Classes</th><th></th></tr>
+        <% list.forEach(function(t){ %>
+          <tr>
+            <td><%= t.name %></td><td class="mono"><%= t.code_display %></td><td><%= (t.classes||[]).join(', ') || 'All' %></td>
+            <td>
+              <form method="POST" action="/admin/teachers/<%= t.id %>/delete" data-confirm="Remove <%= t.name %>?">
+                <button class="btn-outline btn-sm" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </table>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/dash-close') %>

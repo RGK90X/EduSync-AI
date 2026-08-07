@@ -1,0 +1,34 @@
+<%- include('partials/head', { title: 'Choose your portal' }) %>
+<%- include('partials/splash') %>
+<%- include('partials/topbar') %>
+<div class="center-stage fade-in">
+  <div style="width:100%;">
+    <div class="portal-hero">
+      <div class="eyebrow">Three Portals &middot; One Circle</div>
+      <h1>Choose your portal</h1>
+      <p>Attendance, remarks, leave requests, complaints, timetables and homework — synced in real time across student, teacher and admin.</p>
+    </div>
+    <div class="portal-grid">
+      <a class="portal-card" href="/login/student">
+        <div class="portal-icon">&#9737;</div>
+        <h3>Student</h3>
+        <p>View attendance, remarks, timetable, homework and syllabus. Submit leave requests and complaints.</p>
+        <span class="portal-enter">Enter &rarr;</span>
+      </a>
+      <a class="portal-card" href="/login/teacher">
+        <div class="portal-icon">&#9878;</div>
+        <h3>Teacher</h3>
+        <p>Mark attendance, give remarks, review leave requests, file complaints, manage timetable & homework.</p>
+        <span class="portal-enter">Enter &rarr;</span>
+      </a>
+      <a class="portal-card" href="/login/admin">
+        <div class="portal-icon">&#9819;</div>
+        <h3>Admin</h3>
+        <p>Full control — manage students & teacher accounts, analytics, timetable, and school-wide announcements.</p>
+        <span class="portal-enter">Enter &rarr;</span>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="footer-note">EduSync AI — school expo portal.</div>
+<%- include('partials/foot') %>

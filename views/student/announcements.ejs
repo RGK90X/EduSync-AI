@@ -1,0 +1,6 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Announcements</h2><p>School-wide events and notices.</p></div>
+<div class="card">
+  <%- include('../partials/announcements-list', { announcements: rows }) %>
+</div>
+<%- include('../partials/dash-close') %>

@@ -1,0 +1,42 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Leave Request</h2><p>Submit a request to your teacher or admin.</p></div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-label">New Request</div>
+    <form method="POST" action="/student/leave" enctype="multipart/form-data">
+      <div class="field"><label>Leave Type</label>
+        <select id="lv-type" name="type"><option value="other">General</option><option value="sick">Sick Leave</option></select>
+      </div>
+      <div class="field"><label>Reason</label><textarea name="reason" placeholder="Explain your reason for leave..."></textarea></div>
+      <div class="field" id="lv-doc-wrap" style="display:none;">
+        <label>Medical Certificate / Prescription (PDF, JPEG or PNG, up to 3MB)</label>
+        <input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png">
+        <div class="hint">Required for sick leave.</div>
+      </div>
+      <button class="btn" type="submit">Submit Request</button>
+      <% if (error) { %><div class="err-msg"><%= error %></div><% } %>
+      <% if (ok) { %><div class="ok-msg"><%= ok %></div><% } %>
+    </form>
+  </div>
+  <div class="card">
+    <div class="section-label">My Requests</div>
+    <% if (!rows.length) { %>
+      <div class="empty-state">No leave requests submitted.</div>
+    <% } else { rows.forEach(function(l){ %>
+      <div class="list-item">
+        <div class="list-item-head">
+          <span class="list-item-title"><%= l.type === 'sick' ? 'Sick Leave' : 'General Leave' %></span>
+          <% if (l.status === 'pending') { %><span class="badge badge-pending">Pending</span>
+          <% } else if (l.status === 'approved') { %><span class="badge badge-approved">Approved</span>
+          <% } else { %><span class="badge badge-rejected">Rejected</span><% } %>
+        </div>
+        <div class="list-item-body">
+          <%= l.reason %>
+          <% if (l.has_file) { %><br><a class="mono" href="/files/leave/<%= l.id %>/certificate">&#128206; <%= l.file_name %></a><% } %>
+        </div>
+        <div class="list-item-meta" style="margin-top:6px;">Submitted <%= fmtDate(l.date) %><% if (l.responded_by) { %> &middot; reviewed by <%= l.responded_by %><% } %></div>
+      </div>
+    <% }); } %>
+  </div>
+</div>
+<%- include('../partials/dash-close') %>

@@ -1,0 +1,8 @@
+<div class="sidebar">
+  <div class="sidebar-title">Menu</div>
+  <% navItems.forEach(function(item){ %>
+    <a class="nav-item <%= active === item.key ? 'active' : '' %>" href="<%= item.href %>">
+      <span><%- item.icon %></span><span><%= item.label %></span>
+    </a>
+  <% }); %>
+</div>

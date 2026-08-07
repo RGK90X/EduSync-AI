@@ -1,0 +1,12 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Welcome, <%= user.name %></h2><p><%= user.class %> &middot; Admission No. <span class="mono"><%= user.admissionNo %></span></p></div>
+<div class="grid-3" style="margin-bottom:20px;">
+  <div class="card stat-card"><div class="stat-num"><%= summary.pct %>%</div><div class="stat-label">Attendance rate</div></div>
+  <div class="card stat-card"><div class="stat-num"><%= summary.late %></div><div class="stat-label">Times late</div></div>
+  <div class="card stat-card"><div class="stat-num"><%= remarksCount %></div><div class="stat-label">Remarks received</div></div>
+</div>
+<div class="card">
+  <div class="section-label">Recent Announcements</div>
+  <%- include('../partials/announcements-list', { announcements: announcements }) %>
+</div>
+<%- include('../partials/dash-close') %>

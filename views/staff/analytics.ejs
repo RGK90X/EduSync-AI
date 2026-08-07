@@ -1,0 +1,27 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Attendance Analytics</h2><p>Late-coming trends by class and month.</p></div>
+<% if (!classes.length) { %>
+  <div class="card"><div class="empty-state">No classes yet — analytics will appear once students are added.</div></div>
+<% } else { %>
+<div class="grid-2" style="margin-bottom:18px;">
+  <div class="card stat-card"><div class="stat-num"><%= totalLate %></div><div class="stat-label">Total late marks</div></div>
+  <div class="card stat-card"><div class="stat-num"><%= totalRecords ? Math.round((totalLate / totalRecords) * 100) : 0 %>%</div><div class="stat-label">Of all attendance records</div></div>
+</div>
+<div class="card" style="margin-bottom:18px;">
+  <div class="section-label">Late Arrivals by Class</div>
+  <% if (lateByClass.some(function(x){ return x[1] > 0; })) { %>
+    <%- include('../partials/bar-chart', { pairs: lateByClass }) %>
+  <% } else { %>
+    <div class="empty-state">No late records yet — mark attendance to populate this chart.</div>
+  <% } %>
+</div>
+<div class="card">
+  <div class="section-label">Late Arrivals — Last 6 Months</div>
+  <% if (lateByMonth.some(function(x){ return x[1] > 0; })) { %>
+    <%- include('../partials/bar-chart', { pairs: lateByMonth }) %>
+  <% } else { %>
+    <div class="empty-state">No late records yet this period.</div>
+  <% } %>
+</div>
+<% } %>
+<%- include('../partials/dash-close') %>

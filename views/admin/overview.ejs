@@ -1,0 +1,12 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Admin Overview</h2><p>School-wide snapshot.</p></div>
+<div class="grid-3" style="margin-bottom:18px;">
+  <div class="card stat-card"><div class="stat-num"><%= totalStudents %></div><div class="stat-label">Students enrolled</div></div>
+  <div class="card stat-card"><div class="stat-num"><%= totalTeachers %></div><div class="stat-label">Teacher accounts</div></div>
+  <div class="card stat-card"><div class="stat-num"><%= pendingLeaveCount %></div><div class="stat-label">Pending leave requests</div></div>
+</div>
+<div class="card">
+  <div class="section-label">Recent Announcements</div>
+  <%- include('../partials/announcements-list', { announcements: announcements }) %>
+</div>
+<%- include('../partials/dash-close') %>

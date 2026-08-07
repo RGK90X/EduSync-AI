@@ -1,0 +1,32 @@
+<%- include('partials/head', { title: role.charAt(0).toUpperCase() + role.slice(1) + ' Login' }) %>
+<%- include('partials/topbar') %>
+<div class="center-stage fade-in">
+  <div style="width:100%; max-width:400px;">
+    <a class="back-link" href="/">&larr; All portals</a>
+    <div class="auth-card">
+      <h2><%= role.charAt(0).toUpperCase() + role.slice(1) %> Login</h2>
+      <div class="auth-sub">
+        <% if (role === 'student') { %>Enter your details exactly as issued by school
+        <% } else if (role === 'teacher') { %>Enter your name and issued code
+        <% } else { %>Restricted access<% } %>
+      </div>
+      <form method="POST" action="/login/<%= role %>">
+        <% if (role === 'student') { %>
+          <div class="field"><label>Full Name</label><input name="name" type="text" placeholder="e.g. Aarav Mehta"></div>
+          <div class="field"><label>Admission Number</label><input name="admissionNo" class="mono" type="text" placeholder="M01001" style="text-transform:uppercase;"></div>
+          <div class="hint">Your exact admission number (as entered by your school) logs you in — even if the name doesn't match exactly.</div>
+        <% } else if (role === 'teacher') { %>
+          <div class="field"><label>Full Name</label><input name="name" type="text" placeholder="e.g. Mrs. Sen"></div>
+          <div class="field"><label>Teacher Code</label><input name="code" class="mono" type="text" placeholder="TCH-2201" style="text-transform:uppercase;"></div>
+          <div class="hint">Your code is issued by the Admin. Contact the school office if you don't have one.</div>
+        <% } else { %>
+          <div class="field"><label>Full Name</label><input name="name" type="text" placeholder="e.g. Admin"></div>
+          <div class="field"><label>Admin Passcode</label><input name="passcode" class="mono" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+        <% } %>
+        <div class="err-msg"><%= error || '' %></div>
+        <button class="btn" type="submit" style="margin-top:6px;">Log In</button>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

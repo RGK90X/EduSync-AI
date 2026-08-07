@@ -1,0 +1,14 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Homework</h2><p>Assignments for <%= className %>.</p></div>
+<div class="card">
+  <% if (!rows.length) { %>
+    <div class="empty-state">No homework posted yet.</div>
+  <% } else { rows.forEach(function(h){ %>
+    <div class="list-item">
+      <div class="list-item-head"><span class="list-item-title"><%= h.subject %></span><span class="list-item-meta">Due <%= fmtDate(h.due_date) %></span></div>
+      <div class="list-item-body"><%= h.text %></div>
+      <div class="list-item-meta" style="margin-top:6px;">Posted by <%= h.by_name %> &middot; <%= fmtDate(h.date) %></div>
+    </div>
+  <% }); } %>
+</div>
+<%- include('../partials/dash-close') %>

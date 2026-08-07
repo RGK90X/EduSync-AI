@@ -1,0 +1,40 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Complaints</h2><p>File a complaint about a student, or view student-submitted complaints.</p></div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-label">File Complaint (about a student)</div>
+    <form method="POST" action="/staff/complaints">
+      <div class="field"><label>Student Admission Number</label><input name="admissionNo" class="mono" placeholder="M01001" style="text-transform:uppercase;"></div>
+      <div class="field"><label>Category</label>
+        <select name="category"><option>Attendance</option><option>Homework Pending</option><option>Conduct</option><option>Other</option></select>
+      </div>
+      <div class="field"><label>Details</label><textarea name="text" placeholder="Describe the issue..."></textarea></div>
+      <button class="btn" type="submit">Submit Complaint</button>
+      <% if (error) { %><div class="err-msg"><%= error %></div><% } %>
+      <% if (ok) { %><div class="ok-msg"><%= ok %></div><% } %>
+    </form>
+  </div>
+  <div class="card">
+    <div class="section-label">Student Complaints (school-wide)</div>
+    <% if (!studentComplaints.length) { %>
+      <div class="empty-state">No student complaints filed.</div>
+    <% } else { studentComplaints.forEach(function(c){ %>
+      <div class="list-item">
+        <div class="list-item-head"><span class="list-item-title"><%= c.category %></span><span class="list-item-meta"><%= fmtDate(c.date) %></span></div>
+        <div class="list-item-body"><%= c.text %></div>
+      </div>
+    <% }); } %>
+  </div>
+</div>
+<% if (own.length) { %>
+<div class="card" style="margin-top:18px;">
+  <div class="section-label">Complaints You've Filed</div>
+  <% own.forEach(function(c){ %>
+    <div class="list-item">
+      <div class="list-item-head"><span class="list-item-title"><%= c.category %> &mdash; <span class="mono"><%= c.about_admission_no || '' %></span></span><span class="list-item-meta"><%= fmtDate(c.date) %></span></div>
+      <div class="list-item-body"><%= c.text %></div>
+    </div>
+  <% }); %>
+</div>
+<% } %>
+<%- include('../partials/dash-close') %>

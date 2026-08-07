@@ -1,0 +1,19 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Announcements</h2><p>Post school-wide events and notices.</p></div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-label">New Announcement</div>
+    <form method="POST" action="/staff/announcements">
+      <div class="field"><label>Title</label><input name="title" placeholder="e.g. Annual Sports Day"></div>
+      <div class="field"><label>Details</label><textarea name="text" placeholder="Details..."></textarea></div>
+      <button class="btn" type="submit">Post Announcement</button>
+      <% if (error) { %><div class="err-msg"><%= error %></div><% } %>
+      <% if (ok) { %><div class="ok-msg"><%= ok %></div><% } %>
+    </form>
+  </div>
+  <div class="card">
+    <div class="section-label">All Announcements</div>
+    <%- include('../partials/announcements-list', { announcements: rows }) %>
+  </div>
+</div>
+<%- include('../partials/dash-close') %>

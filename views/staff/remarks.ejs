@@ -1,0 +1,27 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Give Remarks</h2><p>Enter student admission number and name to leave a remark.</p></div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-label">New Remark</div>
+    <form method="POST" action="/staff/remarks">
+      <div class="field"><label>Admission Number</label><input name="admissionNo" class="mono" placeholder="M01001" style="text-transform:uppercase;"></div>
+      <div class="field"><label>Student Name</label><input name="name" placeholder="Student name"></div>
+      <div class="field"><label>Remark</label><textarea name="text" placeholder="Write your remark..."></textarea></div>
+      <button class="btn" type="submit">Post Remark</button>
+      <% if (error) { %><div class="err-msg"><%= error %></div><% } %>
+      <% if (ok) { %><div class="ok-msg"><%= ok %></div><% } %>
+    </form>
+  </div>
+  <div class="card">
+    <div class="section-label">Recent Remarks Given</div>
+    <% if (!given.length) { %>
+      <div class="empty-state">No remarks given yet.</div>
+    <% } else { given.forEach(function(r){ %>
+      <div class="list-item">
+        <div class="list-item-head"><span class="list-item-title"><%= r.admission_no %></span><span class="list-item-meta"><%= fmtDate(r.date) %></span></div>
+        <div class="list-item-body"><%= r.text %></div>
+      </div>
+    <% }); } %>
+  </div>
+</div>
+<%- include('../partials/dash-close') %>

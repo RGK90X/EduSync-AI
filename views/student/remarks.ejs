@@ -1,0 +1,13 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>My Remarks</h2><p>Feedback from your teachers and admin.</p></div>
+<div class="card">
+  <% if (!rows.length) { %>
+    <div class="empty-state">No remarks yet.</div>
+  <% } else { rows.forEach(function(r){ %>
+    <div class="list-item">
+      <div class="list-item-head"><span class="list-item-title"><%= r.by_name %></span><span class="list-item-meta"><%= fmtDate(r.date) %></span></div>
+      <div class="list-item-body"><%= r.text %></div>
+    </div>
+  <% }); } %>
+</div>
+<%- include('../partials/dash-close') %>

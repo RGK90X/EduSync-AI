@@ -1,0 +1,28 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Leave Requests</h2><p>Review and respond to student requests.</p></div>
+<div class="card">
+  <% if (!rows.length) { %>
+    <div class="empty-state">No leave requests to review.</div>
+  <% } else { rows.forEach(function(l){ %>
+    <div class="list-item">
+      <div class="list-item-head">
+        <span class="list-item-title"><%= l.student_name %> <span class="mono hint">(<%= l.admission_no %>)</span></span>
+        <% if (l.status === 'pending') { %><span class="badge badge-pending">Pending</span>
+        <% } else if (l.status === 'approved') { %><span class="badge badge-approved">Approved</span>
+        <% } else { %><span class="badge badge-rejected">Rejected</span><% } %>
+      </div>
+      <div class="list-item-body">
+        <% if (l.type === 'sick') { %><strong>Sick Leave</strong> &mdash; <% } %><%= l.reason %>
+        <% if (l.has_file) { %><br><a class="mono" href="/files/leave/<%= l.id %>/certificate">&#128206; <%= l.file_name %></a><% } %>
+      </div>
+      <div class="list-item-meta" style="margin-top:4px;">Submitted <%= fmtDate(l.date) %><% if (l.responded_by) { %> &middot; reviewed by <%= l.responded_by %><% } %></div>
+      <% if (l.status === 'pending') { %>
+      <div class="action-row">
+        <form method="POST" action="/staff/leave/<%= l.id %>/approve"><button class="btn btn-sm" type="submit">Approve</button></form>
+        <form method="POST" action="/staff/leave/<%= l.id %>/reject"><button class="btn btn-sm btn-danger" type="submit">Reject</button></form>
+      </div>
+      <% } %>
+    </div>
+  <% }); } %>
+</div>
+<%- include('../partials/dash-close') %>

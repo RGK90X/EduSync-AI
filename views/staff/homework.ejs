@@ -1,0 +1,33 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>Homework</h2><p>Post assignments for a class.</p></div>
+<div class="grid-2">
+  <div class="card">
+    <% if (classes.length) { %>
+    <div class="section-label">New Assignment</div>
+    <form method="POST" action="/staff/homework">
+      <div class="field"><label>Class</label><select name="class"><% classes.forEach(function(c){ %><option value="<%= c %>"><%= c %></option><% }); %></select></div>
+      <div class="field"><label>Subject</label><input name="subject" placeholder="e.g. Mathematics"></div>
+      <div class="field"><label>Details</label><textarea name="text" placeholder="Assignment details..."></textarea></div>
+      <div class="field"><label>Due Date</label><input type="date" name="dueDate"></div>
+      <button class="btn" type="submit">Post Homework</button>
+      <% if (error) { %><div class="err-msg"><%= error %></div><% } %>
+      <% if (ok) { %><div class="ok-msg"><%= ok %></div><% } %>
+    </form>
+    <% } else { %>
+      <div class="empty-state">No classes yet — add a student first.</div>
+    <% } %>
+  </div>
+  <div class="card">
+    <div class="section-label">All Homework</div>
+    <% if (!rows.length) { %>
+      <div class="empty-state">No homework posted yet.</div>
+    <% } else { rows.forEach(function(h){ %>
+      <div class="list-item">
+        <div class="list-item-head"><span class="list-item-title"><%= h.class %> &middot; <%= h.subject %></span><span class="list-item-meta">Due <%= fmtDate(h.due_date) %></span></div>
+        <div class="list-item-body"><%= h.text %></div>
+        <div class="list-item-meta" style="margin-top:6px;">Posted by <%= h.by_name %> &middot; <%= fmtDate(h.date) %></div>
+      </div>
+    <% }); } %>
+  </div>
+</div>
+<%- include('../partials/dash-close') %>

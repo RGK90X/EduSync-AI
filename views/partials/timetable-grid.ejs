@@ -1,0 +1,28 @@
+<div class="content-head"><h2>Timetable — <%= className %></h2><p><%= editable ? 'Editable by teachers and admin only.' : 'View only.' %></p></div>
+<div class="card" style="overflow-x:auto;">
+  <% if (editable) { %>
+  <form method="POST" action="<%= saveAction %>">
+  <% } %>
+  <table class="tt-table">
+    <tr><th>Period</th><% days.forEach(function(d){ %><th><%= d %></th><% }); %></tr>
+    <% periods.forEach(function(p){ %>
+      <tr>
+        <th>P<%= p %></th>
+        <% days.forEach(function(d){ var key = d + '-' + p; var val = grid[key] || ''; %>
+          <td>
+            <% if (editable) { %>
+              <input name="tt[<%= key %>]" value="<%= val %>" placeholder="&mdash;">
+            <% } else { %>
+              <%= val || '—' %>
+            <% } %>
+          </td>
+        <% }); %>
+      </tr>
+    <% }); %>
+  </table>
+  <% if (editable) { %>
+    <button class="btn btn-sm" type="submit" style="margin-top:16px;">Save Timetable</button>
+    <% if (typeof ok !== 'undefined' && ok) { %><div class="ok-msg"><%= ok %></div><% } %>
+  </form>
+  <% } %>
+</div>

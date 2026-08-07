@@ -1,0 +1,24 @@
+<%- include('../partials/dash-open') %>
+<div class="content-head"><h2>My Attendance</h2><p>Full record marked by your teachers &amp; admin.</p></div>
+<div class="card">
+  <% if (!rows.length) { %>
+    <div class="empty-state">No attendance records yet.</div>
+  <% } else { %>
+    <table>
+      <tr><th>Date</th><th>Class</th><th>Status</th><th>Marked By</th></tr>
+      <% rows.forEach(function(a){ %>
+        <tr>
+          <td><%= fmtDate(a.date) %></td>
+          <td><%= a.class %></td>
+          <td>
+            <% if (a.status === 'present') { %><span class="badge badge-present">Present</span>
+            <% } else if (a.status === 'absent') { %><span class="badge badge-absent">Absent</span>
+            <% } else { %><span class="badge badge-late">Late</span><% } %>
+          </td>
+          <td><%= a.marked_by %></td>
+        </tr>
+      <% }); %>
+    </table>
+  <% } %>
+</div>
+<%- include('../partials/dash-close') %>

@@ -1,0 +1,15 @@
+<%- include('../partials/dash-open') %>
+<% if (!classes.length) { %>
+  <div class="content-head"><h2>Timetable Editor</h2><p>Choose a class to edit. Changes save for the whole school.</p></div>
+  <div class="card"><div class="empty-state">No classes yet — add a student first to create a class.</div></div>
+<% } else { %>
+  <form method="GET" action="/staff/timetable" id="tt-picker-form">
+    <div class="field" style="max-width:220px; margin-bottom:16px;"><label>Class</label>
+      <select name="class" onchange="document.getElementById('tt-picker-form').submit()">
+        <% classes.forEach(function(c){ %><option value="<%= c %>" <%= c === cls ? 'selected' : '' %>><%= c %></option><% }); %>
+      </select>
+    </div>
+  </form>
+  <%- include('../partials/timetable-grid', { className: cls, grid: grid, days: days, periods: periods, editable: true, saveAction: saveAction, ok: ok }) %>
+<% } %>
+<%- include('../partials/dash-close') %>
