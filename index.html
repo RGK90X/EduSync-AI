@@ -306,6 +306,17 @@ tr:last-child td{ border-bottom:none; }
 .occasion-date{ text-align:center; font-size:.78rem; }
 
 .footer-note{ text-align:center; padding:16px; font-size:.72rem; border-top:1px solid var(--border); }
+
+.edu-banner{ overflow:hidden; background:var(--bg-alt); border-bottom:1px solid var(--border); padding:10px 0; }
+.edu-banner-track{ display:flex; width:max-content; animation: eduScroll 22s linear infinite; }
+.edu-banner:hover .edu-banner-track{ animation-play-state:paused; }
+.edu-banner-item{
+  display:flex; align-items:center; gap:8px; padding:0 28px; font-size:.82rem; white-space:nowrap;
+  border-right:1px solid var(--border-bright);
+}
+.edu-banner-item .icon{ font-size:1rem; }
+@keyframes eduScroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+@media (prefers-reduced-motion: reduce){ .edu-banner-track{ animation:none; } }
 </style>
 </head>
 <body>
@@ -422,12 +433,21 @@ function animateStatNumbers(){
 }
 
 /* ===================== PORTAL SELECT ===================== */
+function renderEduBanner(){
+  const items = [
+    ['&#127891;','Learn'], ['&#128218;','Grow'], ['&#9999;&#65039;','Practice'], ['&#127942;','Achieve'],
+    ['&#128300;','Explore'], ['&#127793;','Nurture'], ['&#128161;','Discover'], ['&#129309;','Collaborate']
+  ];
+  const row = items.map(([icon,label])=>`<div class="edu-banner-item"><span class="icon">${icon}</span><span>${esc(label)}</span></div>`).join('');
+  return `<div class="edu-banner"><div class="edu-banner-track">${row}${row}</div></div>`;
+}
 function renderPortalSelect(){
   return `
   <div class="topbar">
     <div class="brand"><div class="brand-mark">ES</div>EduSync AI</div>
     <div style="font-size:.8rem;">School Expo Demo</div>
   </div>
+  ${renderEduBanner()}
   <div class="center-stage fade-in">
     <div style="width:100%;">
       <div class="portal-hero">
@@ -480,6 +500,7 @@ function renderSchoolLife(){
   <div class="topbar">
     <div class="brand"><div class="brand-mark">ES</div>EduSync AI</div>
   </div>
+  ${renderEduBanner()}
   <div class="center-stage fade-in">
     <div style="width:100%; max-width:1100px; margin:0 auto;">
       <button class="back-link" id="back-to-portal">&larr; All portals</button>
@@ -645,14 +666,17 @@ function renderBarChart(dataPairs){
     <div class="bar" style="height:${val===0?2:Math.max(6,(val/max)*130)}px;"></div>
     <div class="bar-lbl">${esc(lbl)}</div></div>`).join('')}</div>`;
 }
-function renderAnnouncementsList(limit){
+function renderAnnouncementsList(limit, canRemove){
   const list = db.announcements.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,limit);
   if(!list.length) return `<div class="empty-state">No announcements yet.</div>`;
   return list.map(a=>`
     <div class="list-item">
       <div class="list-item-head"><span class="list-item-title">${esc(a.title)}</span><span class="list-item-meta">${fmtDate(a.date)}</span></div>
       <div class="list-item-body">${esc(a.text)}</div>
-      <div class="list-item-meta" style="margin-top:6px;">Posted by ${esc(a.by)}</div>
+      <div class="list-item-meta" style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <span>Posted by ${esc(a.by)}</span>
+        ${canRemove ? `<button class="btn-outline btn-sm" data-del-announcement="${a.id}">Remove</button>` : ''}
+      </div>
     </div>`).join('');
 }
 function renderTimetableView(cls, editable){
@@ -865,11 +889,19 @@ function renderComplaintTeacher(name){
       <div class="err-msg" id="tcx-err"></div>
     </div>
     <div class="card"><div class="section-label">Student Complaints (school-wide)</div>
-      ${studentComplaints.length ? studentComplaints.map(c=>`<div class="list-item"><div class="list-item-head"><span class="list-item-title">${esc(c.category)}</span><span class="list-item-meta">${fmtDate(c.date)}</span></div><div class="list-item-body">${esc(c.text)}</div></div>`).join('') : `<div class="empty-state">No student complaints filed.</div>`}
+      ${studentComplaints.length ? studentComplaints.map(c=>`
+        <div class="list-item"><div class="list-item-head"><span class="list-item-title">${esc(c.category)}</span><span class="list-item-meta">${fmtDate(c.date)}</span></div>
+        <div class="list-item-body">${esc(c.text)}</div>
+        <div class="action-row"><button class="btn-outline btn-sm" data-del-complaint="${c.id}">Remove</button></div>
+        </div>`).join('') : `<div class="empty-state">No student complaints filed.</div>`}
     </div>
   </div>
   ${own.length ? `<div class="card" style="margin-top:18px;"><div class="section-label">Complaints You've Filed</div>
-    ${own.map(c=>`<div class="list-item"><div class="list-item-head"><span class="list-item-title">${esc(c.category)} &mdash; <span class="mono">${esc(c.aboutAdm||'')}</span></span><span class="list-item-meta">${fmtDate(c.date)}</span></div><div class="list-item-body">${esc(c.text)}</div></div>`).join('')}</div>` : ''}`;
+    ${own.map(c=>`
+      <div class="list-item"><div class="list-item-head"><span class="list-item-title">${esc(c.category)} &mdash; <span class="mono">${esc(c.aboutAdm||'')}</span></span><span class="list-item-meta">${fmtDate(c.date)}</span></div>
+      <div class="list-item-body">${esc(c.text)}</div>
+      <div class="action-row"><button class="btn-outline btn-sm" data-del-complaint="${c.id}">Remove</button></div>
+      </div>`).join('')}</div>` : ''}`;
 }
 function renderTimetableEditor(scopeClasses){
   if(!scopeClasses.length) return `<div class="content-head"><h2>Timetable Editor</h2></div><div class="card"><div class="empty-state">No classes yet — add a student first.</div></div>`;
@@ -920,7 +952,7 @@ function renderAnnounceManager(byName){
       <div class="field"><label>Details</label><textarea id="an-text" placeholder="Details..."></textarea></div>
       <button class="btn" id="an-submit">Post Announcement</button>
     </div>
-    <div class="card"><div class="section-label">All Announcements</div>${renderAnnouncementsList(50)}</div>
+    <div class="card"><div class="section-label">All Announcements</div>${renderAnnouncementsList(50, true)}</div>
   </div>`;
 }
 
@@ -935,13 +967,26 @@ function renderAdminTab(tab){
       <div class="card stat-card"><div class="stat-num">${db.teachers.length}</div><div class="stat-label">Teacher accounts</div></div>
       <div class="card stat-card"><div class="stat-num">${pendingLeaves}</div><div class="stat-label">Pending leave requests</div></div>
     </div>
-    <div class="card" style="margin-bottom:18px;"><div class="section-label">Recent Announcements</div>${renderAnnouncementsList(3)}</div>
-    <div class="card">
+    <div class="card" style="margin-bottom:18px;"><div class="section-label">Recent Announcements</div>${renderAnnouncementsList(3, true)}</div>
+    <div class="card" style="margin-bottom:18px;">
       <div class="section-label">Sample Data</div>
-      <p style="font-size:.85rem; margin-bottom:14px;">Fills in random attendance (last ~2 weeks) and a few remarks for every student already added — existing student and teacher names are never changed — plus posts today's Expo invitation announcement.</p>
-      <button class="btn btn-sm" id="gen-demo-data" style="width:auto;">Generate Sample Attendance, Remarks &amp; Announcement</button>
+      <p style="font-size:.85rem; margin-bottom:14px;">Every generator below only reads students/teachers already added — names are never changed or invented.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:6px;">
+        <button class="btn btn-sm" id="gen-demo-data" style="width:auto;">Generate Attendance, Remarks &amp; Expo Announcement</button>
+        <button class="btn btn-sm" id="gen-syllabus" style="width:auto;">Generate Random Syllabus (Commerce)</button>
+        <button class="btn btn-sm" id="gen-timetable" style="width:auto;">Generate Random Timetable</button>
+        <button class="btn btn-sm" id="gen-homework" style="width:auto;">Generate Random Homework</button>
+      </div>
       <div class="ok-msg" id="gen-demo-ok"></div>
       <div class="err-msg" id="gen-demo-err"></div>
+    </div>
+    <div class="card">
+      <div class="section-label">Reset</div>
+      <p style="font-size:.85rem; margin-bottom:14px;">Students and teachers are always kept — only the activity data below is affected.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+        <button class="btn-outline btn-sm" id="reset-attendance">Reset Attendance to Zero</button>
+        <button class="btn-danger btn-sm" id="reset-everything">Reset Everything (Keep Students &amp; Teachers)</button>
+      </div>
     </div>`;
   }
   if(tab==='students') return renderStudentManager();
@@ -1095,6 +1140,74 @@ function generateDemoData(){
   return {ok:true};
 }
 
+const COMMERCE_SYLLABUS = [
+  { subject:'Accountancy', content:'Chapter 1: Introduction to Accounting; Chapter 2: Journal Entries; Chapter 3: Ledger & Trial Balance; Chapter 4: Bank Reconciliation Statement.' },
+  { subject:'Business Studies', content:'Nature and Purpose of Business; Forms of Business Organisation; Private, Public and Global Enterprises; Business Services.' },
+  { subject:'Economics', content:"Introduction to Microeconomics; Consumer's Equilibrium; Demand and Its Determinants; Theory of Production and Cost." },
+  { subject:'English', content:'Prose: The Portrait of a Lady; Poetry: A Photograph; Grammar: Determiners & Tenses; Writing Skills: Notice & Report Writing.' }
+];
+const EXAM_NAMES = ['Unit Test 1', 'Mid-Term Exam', 'Unit Test 2', 'Half-Yearly Exam', 'Final Exam'];
+function generateSyllabus(){
+  const by = state.sub.name || 'Admin';
+  mutate(d=>{
+    COMMERCE_SYLLABUS.forEach(entry=>{
+      const examName = EXAM_NAMES[Math.floor(Math.random()*EXAM_NAMES.length)];
+      d.syllabus.push({ id:uid(), examName, subject:entry.subject, content:entry.content, by, date: todayStr() });
+    });
+  });
+  return {ok:true};
+}
+
+const COMMERCE_TIMETABLE_TEMPLATE = {
+  'Mon-1':'Accountancy','Mon-2':'Accountancy','Mon-3':'English','Mon-4':'Business Studies','Mon-5':'Economics','Mon-6':'Business Studies','Mon-7':'Business Studies',
+  'Tue-1':'Economics','Tue-2':'Economics','Tue-3':'English','Tue-4':'Accountancy','Tue-5':'Accountancy','Tue-6':'Business Studies','Tue-7':'Business Studies',
+  'Wed-1':'Accountancy','Wed-2':'Accountancy','Wed-3':'English','Wed-4':'Economics','Wed-5':'Economics','Wed-6':'Business Studies','Wed-7':'Business Studies',
+  'Thu-1':'Economics','Thu-2':'Economics','Thu-3':'English','Thu-4':'Business Studies','Thu-5':'Business Studies','Thu-6':'Accountancy','Thu-7':'Physical Education',
+  'Fri-1':'Accountancy','Fri-2':'Accountancy','Fri-3':'Computer Science','Fri-4':'Economics','Fri-5':'Economics','Fri-6':'Physical Education','Fri-7':'Computer Science',
+  'Sat-1':'Economics','Sat-2':'Library','Sat-3':'Accountancy','Sat-4':'Business Studies','Sat-5':'Physical Education'
+};
+function generateTimetable(){
+  const classes = getClassList();
+  if(!classes.length){ return {ok:false, msg:'Add at least one student first (to create a class).'}; }
+  mutate(d=>{
+    classes.forEach(cls=>{ d.timetable[cls] = Object.assign({}, COMMERCE_TIMETABLE_TEMPLATE); });
+  });
+  return {ok:true};
+}
+
+const HOMEWORK_TEMPLATES = [
+  { subject:'Accountancy', text:'Complete the journal entries and ledger posting exercise from the workbook.' },
+  { subject:'Business Studies', text:'Write short notes on the forms of business organisation covered in class.' },
+  { subject:'Economics', text:"Solve the numerical problems on consumer's equilibrium from the exercise sheet." },
+  { subject:'English', text:'Read the prescribed prose chapter and answer the comprehension questions.' }
+];
+function generateHomework(){
+  const classes = getClassList();
+  if(!classes.length){ return {ok:false, msg:'Add at least one student first (to create a class).'}; }
+  const by = state.sub.name || 'Admin';
+  mutate(d=>{
+    classes.forEach(cls=>{
+      const count = 2 + Math.floor(Math.random()*2);
+      for(let i=0;i<count;i++){
+        const t = HOMEWORK_TEMPLATES[Math.floor(Math.random()*HOMEWORK_TEMPLATES.length)];
+        const due = new Date(); due.setDate(due.getDate() + 2 + Math.floor(Math.random()*7));
+        d.homework.push({ id:uid(), class:cls, subject:t.subject, text:t.text, dueDate: due.toISOString().slice(0,10), by, date: todayStr() });
+      }
+    });
+  });
+  return {ok:true};
+}
+
+function resetAttendance(){
+  mutate(d=>{ d.attendance = []; });
+}
+function resetEverything(){
+  mutate(d=>{
+    d.attendance = []; d.remarks = []; d.leaves = []; d.complaints = [];
+    d.timetable = {}; d.homework = []; d.syllabus = []; d.announcements = [];
+  });
+}
+
 /* ===================== EVENT BINDING ===================== */
 function bindEvents(){
   document.querySelectorAll('.portal-card').forEach(el=>{
@@ -1103,14 +1216,50 @@ function bindEvents(){
   const schoolLifeLink = document.getElementById('school-life-link');
   if(schoolLifeLink) schoolLifeLink.addEventListener('click', ()=>go('schoolLife'));
 
+  function runGenerator(fn, okMsg){
+    const errEl = document.getElementById('gen-demo-err');
+    if(errEl) errEl.textContent='';
+    const result = fn();
+    if(result && result.ok===false){ if(errEl) errEl.textContent = result.msg; return; }
+    showToast(okMsg);
+  }
   const genDemoBtn = document.getElementById('gen-demo-data');
-  if(genDemoBtn) genDemoBtn.addEventListener('click', ()=>{
-    const okEl = document.getElementById('gen-demo-ok'), errEl = document.getElementById('gen-demo-err');
-    okEl.textContent=''; errEl.textContent='';
-    const result = generateDemoData();
-    if(!result.ok){ errEl.textContent = result.msg; return; }
-    showToast('Sample attendance, remarks & Expo announcement added');
+  if(genDemoBtn) genDemoBtn.addEventListener('click', ()=> runGenerator(generateDemoData, 'Sample attendance, remarks & Expo announcement added'));
+  const genSyllabusBtn = document.getElementById('gen-syllabus');
+  if(genSyllabusBtn) genSyllabusBtn.addEventListener('click', ()=> runGenerator(generateSyllabus, 'Sample Commerce syllabus added'));
+  const genTimetableBtn = document.getElementById('gen-timetable');
+  if(genTimetableBtn) genTimetableBtn.addEventListener('click', ()=> runGenerator(generateTimetable, 'Sample timetable added for all classes'));
+  const genHomeworkBtn = document.getElementById('gen-homework');
+  if(genHomeworkBtn) genHomeworkBtn.addEventListener('click', ()=> runGenerator(generateHomework, 'Sample homework posted for all classes'));
+
+  const resetAttBtn = document.getElementById('reset-attendance');
+  if(resetAttBtn) resetAttBtn.addEventListener('click', ()=>{
+    if(!window.confirm("Reset all attendance records to zero? This can't be undone.")) return;
+    resetAttendance(); showToast('Attendance reset');
   });
+  const resetAllBtn = document.getElementById('reset-everything');
+  if(resetAllBtn) resetAllBtn.addEventListener('click', ()=>{
+    if(!window.confirm("Reset EVERYTHING (attendance, remarks, leaves, complaints, timetable, homework, syllabus, announcements)? Students and teachers are kept. This can't be undone.")) return;
+    resetEverything(); showToast('Everything reset — students & teachers kept');
+  });
+
+  document.querySelectorAll('[data-del-announcement]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      if(!window.confirm('Remove this announcement?')) return;
+      const id = el.dataset.delAnnouncement;
+      mutate(d=>{ d.announcements = d.announcements.filter(a=>a.id!==id); });
+      showToast('Announcement removed');
+    });
+  });
+  document.querySelectorAll('[data-del-complaint]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      if(!window.confirm('Remove this complaint?')) return;
+      const id = el.dataset.delComplaint;
+      mutate(d=>{ d.complaints = d.complaints.filter(c=>c.id!==id); });
+      showToast('Complaint removed');
+    });
+  });
+
   const backToPortal = document.getElementById('back-to-portal');
   if(backToPortal) backToPortal.addEventListener('click', ()=>go('portalSelect'));
 
