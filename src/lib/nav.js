@@ -3,7 +3,8 @@
 const ICONS = {
   overview: '&#9670;', attendance: '&#9678;', analytics: '&#9673;', remarks: '&#9998;',
   leave: '&#9993;', complaint: '&#9873;', timetable: '&#9783;', homework: '&#128218;',
-  syllabus: '&#128220;', announce: '&#128276;', student: '&#9737;', teacher: '&#9878;'
+  syllabus: '&#128220;', announce: '&#128276;', student: '&#9737;', teacher: '&#9878;',
+  schoolLife: '&#127884;'
 };
 
 function navItemsFor(role) {
@@ -17,7 +18,8 @@ function navItemsFor(role) {
       { key: 'timetable', label: 'Timetable', icon: ICONS.timetable, href: '/student/timetable' },
       { key: 'homework', label: 'Homework', icon: ICONS.homework, href: '/student/homework' },
       { key: 'syllabus', label: 'Syllabus', icon: ICONS.syllabus, href: '/student/syllabus' },
-      { key: 'announce', label: 'Announcements', icon: ICONS.announce, href: '/student/announcements' }
+      { key: 'announce', label: 'Announcements', icon: ICONS.announce, href: '/student/announcements' },
+      { key: 'schoolLife', label: 'School Life', icon: ICONS.schoolLife, href: '/school-life' }
     ];
   }
   const staffCommon = [
@@ -29,7 +31,8 @@ function navItemsFor(role) {
     { key: 'timetable', label: 'Timetable', icon: ICONS.timetable, href: '/staff/timetable' },
     { key: 'homework', label: 'Homework', icon: ICONS.homework, href: '/staff/homework' },
     { key: 'syllabus', label: 'Syllabus', icon: ICONS.syllabus, href: '/staff/syllabus' },
-    { key: 'announce', label: 'Announcements', icon: ICONS.announce, href: '/staff/announcements' }
+    { key: 'announce', label: 'Announcements', icon: ICONS.announce, href: '/staff/announcements' },
+    { key: 'schoolLife', label: 'School Life', icon: ICONS.schoolLife, href: '/school-life' }
   ];
   if (role === 'teacher') return staffCommon;
   // admin

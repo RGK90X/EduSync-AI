@@ -11,6 +11,10 @@ router.get('/', (req, res) => {
   res.render('portal-select', { title: 'Choose your portal' });
 });
 
+router.get('/school-life', (req, res) => {
+  res.render('school-life', { title: 'School Life & Events' });
+});
+
 router.get('/login/:role', (req, res) => {
   const { role } = req.params;
   if (!VALID_ROLES.has(role)) return res.status(404).render('errors/404', { title: 'Not Found' });
