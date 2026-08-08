@@ -1,11 +1,20 @@
 const db = require('../pool');
 
+// Builds each of the last 6 months as a "YYYY-MM" string using LOCAL
+// year/month arithmetic only — deliberately avoids the
+// construct-local-date-then-toISOString() pattern, which reports the UTC
+// month and silently shifts the whole window back a month for any positive
+// UTC-offset timezone (e.g. India, UTC+5:30).
 function lastSixMonths() {
   const months = [];
   const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth(); // 0-based
   for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(d.toISOString().slice(0, 7)); // YYYY-MM
+    let mm = m - i;
+    let yy = y;
+    while (mm < 0) { mm += 12; yy -= 1; }
+    months.push(yy + '-' + String(mm + 1).padStart(2, '0'));
   }
   return months;
 }

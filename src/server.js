@@ -3,14 +3,14 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 
-const { fmtDate } = require('./lib/fmt');
+const { fmtDate, todayStr } = require('./lib/fmt');
 
 const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 app.locals.fmtDate = fmtDate;
-app.locals.todayStr = () => new Date().toISOString().slice(0, 10);
+app.locals.todayStr = todayStr;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));

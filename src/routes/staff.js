@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { requireRole } = require('../middleware/auth');
 const { navItemsFor } = require('../lib/nav');
+const { todayStr } = require('../lib/fmt');
 
 const students = require('../db/queries/students');
 const classesQ = require('../db/queries/classes');
@@ -41,7 +42,7 @@ router.get('/attendance', async (req, res, next) => {
       return render(req, res, 'attendance', 'attendance', { title: 'Mark Attendance', classes, cls: null, roster: [], marks: {}, date: null, ok: null });
     }
     const cls = classes.includes(req.query.class) ? req.query.class : classes[0];
-    const date = req.query.date || new Date().toISOString().slice(0, 10);
+    const date = req.query.date || todayStr();
     const roster = await students.listByClass(cls);
     const marks = await attendance.listForClassOnDate(cls, date);
     render(req, res, 'attendance', 'attendance', { title: 'Mark Attendance', classes, cls, roster, marks, date, ok: req.query.ok || null });
@@ -52,7 +53,7 @@ router.post('/attendance', async (req, res, next) => {
   try {
     const classes = await myClasses(req);
     const cls = classes.includes(req.body.class) ? req.body.class : classes[0];
-    const date = req.body.date || new Date().toISOString().slice(0, 10);
+    const date = req.body.date || todayStr();
     const marksObj = req.body.marks || {};
     const marksArr = Object.keys(marksObj).map((adm) => ({ admissionNo: adm, status: marksObj[adm] }));
     await attendance.saveBulk(cls, date, marksArr, req.session.user.name);
@@ -188,7 +189,7 @@ router.post('/homework', async (req, res, next) => {
     const className = req.body.class;
     const subject = (req.body.subject || '').trim();
     const text = (req.body.text || '').trim();
-    const dueDate = req.body.dueDate || new Date().toISOString().slice(0, 10);
+    const dueDate = req.body.dueDate || todayStr();
     const rows = await homework.listAll();
 
     if (!className || !subject || !text) {
