@@ -1,18 +1,11 @@
-const pool = require('../pool');
+const db = require('../pool');
 
 async function listRecent(limit) {
-  const { rows } = await pool.query(
-    'SELECT * FROM announcements ORDER BY date DESC, id DESC LIMIT $1',
-    [limit]
-  );
-  return rows;
+  return db.prepare('SELECT * FROM announcements ORDER BY date DESC, id DESC LIMIT ?').all(limit);
 }
 
 async function create({ title, text, byName }) {
-  await pool.query(
-    'INSERT INTO announcements (title, text, by_name) VALUES ($1, $2, $3)',
-    [title, text, byName]
-  );
+  db.prepare('INSERT INTO announcements (title, text, by_name) VALUES (?, ?, ?)').run(title, text, byName);
 }
 
 module.exports = { listRecent, create };

@@ -2,9 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
-const pgSession = require('connect-pg-simple')(session);
 
-const pool = require('./db/pool');
 const { fmtDate } = require('./lib/fmt');
 
 const app = express();
@@ -17,8 +15,12 @@ app.locals.todayStr = () => new Date().toISOString().slice(0, 10);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// This app runs as a single local process on one laptop (no cloud DB, no
+// horizontal scaling), so an in-memory session store is the right fit —
+// simpler than a DB-backed store, at the cost of logging everyone out if
+// the server restarts (acceptable for an expo booth: just log back in).
 app.use(session({
-  store: new pgSession({ pool, createTableIfMissing: true }),
+  store: new session.MemoryStore(),
   secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
   resave: false,
   saveUninitialized: false,

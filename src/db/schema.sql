@@ -1,104 +1,104 @@
 CREATE TABLE IF NOT EXISTS classes (
-  name VARCHAR(60) PRIMARY KEY
+  name TEXT PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS students (
-  admission_no VARCHAR(20) PRIMARY KEY,
-  name         VARCHAR(120) NOT NULL,
-  class        VARCHAR(60) NOT NULL REFERENCES classes(name),
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+  admission_no TEXT PRIMARY KEY,
+  name         TEXT NOT NULL,
+  class        TEXT NOT NULL REFERENCES classes(name),
+  created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS teachers (
-  id            SERIAL PRIMARY KEY,
-  name          VARCHAR(120) NOT NULL,
-  code_hash     VARCHAR(200) NOT NULL,
-  code_display  VARCHAR(40) NOT NULL,
-  classes       TEXT[] NOT NULL DEFAULT '{}',
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  name          TEXT NOT NULL,
+  code_hash     TEXT NOT NULL,
+  code_display  TEXT NOT NULL,
+  classes_json  TEXT NOT NULL DEFAULT '[]',
+  created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS admins (
-  id            SERIAL PRIMARY KEY,
-  name          VARCHAR(120) NOT NULL DEFAULT 'Admin',
-  passcode_hash VARCHAR(200) NOT NULL,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  name          TEXT NOT NULL DEFAULT 'Admin',
+  passcode_hash TEXT NOT NULL,
+  created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS attendance (
-  id           SERIAL PRIMARY KEY,
-  admission_no VARCHAR(20) NOT NULL REFERENCES students(admission_no) ON DELETE CASCADE,
-  class        VARCHAR(60) NOT NULL,
-  date         DATE NOT NULL,
-  status       VARCHAR(10) NOT NULL CHECK (status IN ('present','absent','late')),
-  marked_by    VARCHAR(120) NOT NULL,
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  admission_no TEXT NOT NULL REFERENCES students(admission_no) ON DELETE CASCADE,
+  class        TEXT NOT NULL,
+  date         TEXT NOT NULL,
+  status       TEXT NOT NULL CHECK (status IN ('present','absent','late')),
+  marked_by    TEXT NOT NULL,
   UNIQUE (admission_no, date)
 );
 
 CREATE TABLE IF NOT EXISTS remarks (
-  id           SERIAL PRIMARY KEY,
-  admission_no VARCHAR(20) NOT NULL REFERENCES students(admission_no) ON DELETE CASCADE,
-  by_name      VARCHAR(120) NOT NULL,
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  admission_no TEXT NOT NULL REFERENCES students(admission_no) ON DELETE CASCADE,
+  by_name      TEXT NOT NULL,
   text         TEXT NOT NULL,
-  date         DATE NOT NULL DEFAULT CURRENT_DATE
+  date         TEXT NOT NULL DEFAULT (date('now'))
 );
 
 CREATE TABLE IF NOT EXISTS leave_requests (
-  id           SERIAL PRIMARY KEY,
-  admission_no VARCHAR(20) NOT NULL REFERENCES students(admission_no) ON DELETE CASCADE,
-  type         VARCHAR(10) NOT NULL CHECK (type IN ('other','sick')),
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  admission_no TEXT NOT NULL REFERENCES students(admission_no) ON DELETE CASCADE,
+  type         TEXT NOT NULL CHECK (type IN ('other','sick')),
   reason       TEXT NOT NULL,
-  file_data    BYTEA NULL,
-  file_mime    VARCHAR(60) NULL,
-  file_name    VARCHAR(200) NULL,
-  status       VARCHAR(10) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')),
-  responded_by VARCHAR(120) NULL,
-  date         DATE NOT NULL DEFAULT CURRENT_DATE
+  file_data    BLOB NULL,
+  file_mime    TEXT NULL,
+  file_name    TEXT NULL,
+  status       TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')),
+  responded_by TEXT NULL,
+  date         TEXT NOT NULL DEFAULT (date('now'))
 );
 
 CREATE TABLE IF NOT EXISTS complaints (
-  id                  SERIAL PRIMARY KEY,
-  source              VARCHAR(10) NOT NULL CHECK (source IN ('student','staff')),
-  filed_by_role       VARCHAR(10) NOT NULL CHECK (filed_by_role IN ('student','teacher','admin')),
-  by_admission_no     VARCHAR(20) NULL REFERENCES students(admission_no) ON DELETE SET NULL,
-  by_name             VARCHAR(120) NULL,
-  about_admission_no  VARCHAR(20) NULL REFERENCES students(admission_no) ON DELETE SET NULL,
-  category            VARCHAR(60) NOT NULL,
+  id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+  source              TEXT NOT NULL CHECK (source IN ('student','staff')),
+  filed_by_role       TEXT NOT NULL CHECK (filed_by_role IN ('student','teacher','admin')),
+  by_admission_no     TEXT NULL REFERENCES students(admission_no) ON DELETE SET NULL,
+  by_name             TEXT NULL,
+  about_admission_no  TEXT NULL REFERENCES students(admission_no) ON DELETE SET NULL,
+  category            TEXT NOT NULL,
   text                TEXT NOT NULL,
-  date                DATE NOT NULL DEFAULT CURRENT_DATE
+  date                TEXT NOT NULL DEFAULT (date('now'))
 );
 
 CREATE TABLE IF NOT EXISTS timetable (
-  class    VARCHAR(60) NOT NULL REFERENCES classes(name),
-  day      VARCHAR(3) NOT NULL CHECK (day IN ('Mon','Tue','Wed','Thu','Fri','Sat')),
-  period   INT NOT NULL CHECK (period BETWEEN 1 AND 7),
-  value    VARCHAR(80) NOT NULL DEFAULT '',
+  class    TEXT NOT NULL REFERENCES classes(name),
+  day      TEXT NOT NULL CHECK (day IN ('Mon','Tue','Wed','Thu','Fri','Sat')),
+  period   INTEGER NOT NULL CHECK (period BETWEEN 1 AND 7),
+  value    TEXT NOT NULL DEFAULT '',
   PRIMARY KEY (class, day, period)
 );
 
 CREATE TABLE IF NOT EXISTS homework (
-  id          SERIAL PRIMARY KEY,
-  class       VARCHAR(60) NOT NULL,
-  subject     VARCHAR(80) NOT NULL,
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  class       TEXT NOT NULL,
+  subject     TEXT NOT NULL,
   text        TEXT NOT NULL,
-  due_date    DATE NOT NULL,
-  by_name     VARCHAR(120) NOT NULL,
-  date        DATE NOT NULL DEFAULT CURRENT_DATE
+  due_date    TEXT NOT NULL,
+  by_name     TEXT NOT NULL,
+  date        TEXT NOT NULL DEFAULT (date('now'))
 );
 
 CREATE TABLE IF NOT EXISTS syllabus (
-  id          SERIAL PRIMARY KEY,
-  exam_name   VARCHAR(120) NOT NULL,
-  subject     VARCHAR(80) NOT NULL,
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  exam_name   TEXT NOT NULL,
+  subject     TEXT NOT NULL,
   content     TEXT NOT NULL,
-  by_name     VARCHAR(120) NOT NULL,
-  date        DATE NOT NULL DEFAULT CURRENT_DATE
+  by_name     TEXT NOT NULL,
+  date        TEXT NOT NULL DEFAULT (date('now'))
 );
 
 CREATE TABLE IF NOT EXISTS announcements (
-  id          SERIAL PRIMARY KEY,
-  title       VARCHAR(160) NOT NULL,
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  title       TEXT NOT NULL,
   text        TEXT NOT NULL,
-  by_name     VARCHAR(120) NOT NULL,
-  date        DATE NOT NULL DEFAULT CURRENT_DATE
+  by_name     TEXT NOT NULL,
+  date        TEXT NOT NULL DEFAULT (date('now'))
 );

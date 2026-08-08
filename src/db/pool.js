@@ -1,15 +1,15 @@
 require('dotenv').config();
-const { Pool } = require('pg');
+const path = require('path');
+const fs = require('fs');
+const { DatabaseSync } = require('node:sqlite');
 
-if (!process.env.DATABASE_URL) {
-  console.warn('WARNING: DATABASE_URL is not set. Set it in .env (see .env.example).');
-}
+const dbFile = process.env.DB_FILE || './data/edusync.db';
+const absPath = path.isAbsolute(dbFile) ? dbFile : path.join(__dirname, '..', '..', dbFile);
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('localhost')
-    ? false
-    : { rejectUnauthorized: false }
-});
+fs.mkdirSync(path.dirname(absPath), { recursive: true });
 
-module.exports = pool;
+const db = new DatabaseSync(absPath);
+db.exec('PRAGMA foreign_keys = ON');
+db.exec('PRAGMA journal_mode = WAL');
+
+module.exports = db;

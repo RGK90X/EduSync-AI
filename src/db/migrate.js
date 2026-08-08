@@ -1,15 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const pool = require('./pool');
+const db = require('./pool');
 
-async function migrate() {
+function migrate() {
   const sql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
-  await pool.query(sql);
+  db.exec(sql);
   console.log('Migration complete: all tables created (or already existed).');
-  await pool.end();
 }
 
-migrate().catch((err) => {
-  console.error('Migration failed:', err);
-  process.exit(1);
-});
+migrate();

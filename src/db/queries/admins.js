@@ -1,10 +1,10 @@
 const bcrypt = require('bcryptjs');
-const pool = require('../pool');
+const db = require('../pool');
 
 async function findByPasscode(passcode) {
-  const { rows } = await pool.query('SELECT * FROM admins');
+  const rows = db.prepare('SELECT * FROM admins').all();
   for (const a of rows) {
-    if (await bcrypt.compare(passcode, a.passcode_hash)) return a;
+    if (bcrypt.compareSync(passcode, a.passcode_hash)) return a;
   }
   return null;
 }

@@ -1,18 +1,25 @@
 const bcrypt = require('bcryptjs');
-const pool = require('../pool');
+const db = require('../pool');
 const { registerClass } = require('./classes');
 
+function withClasses(row) {
+  if (!row) return row;
+  let classes = [];
+  try { classes = JSON.parse(row.classes_json || '[]'); } catch (e) { classes = []; }
+  return Object.assign({}, row, { classes });
+}
+
 async function listAll() {
-  const { rows } = await pool.query('SELECT id, name, code_display, classes FROM teachers ORDER BY name ASC');
-  return rows;
+  const rows = db.prepare('SELECT id, name, code_display, classes_json FROM teachers ORDER BY name ASC').all();
+  return rows.map(withClasses);
 }
 
 // Teacher codes are hashed, so lookup means comparing the entered code
 // against every stored hash (fine at expo scale — a handful of teachers).
 async function findByCode(code) {
-  const { rows } = await pool.query('SELECT * FROM teachers');
+  const rows = db.prepare('SELECT * FROM teachers').all();
   for (const t of rows) {
-    if (await bcrypt.compare(code, t.code_hash)) return t;
+    if (bcrypt.compareSync(code, t.code_hash)) return withClasses(t);
   }
   return null;
 }
@@ -26,15 +33,13 @@ async function create({ name, code, classes }) {
   for (const c of classes) {
     normClasses.push(await registerClass(c));
   }
-  const hash = await bcrypt.hash(code, 10);
-  await pool.query(
-    'INSERT INTO teachers (name, code_hash, code_display, classes) VALUES ($1, $2, $3, $4)',
-    [name, hash, code, normClasses]
-  );
+  const hash = bcrypt.hashSync(code, 10);
+  db.prepare('INSERT INTO teachers (name, code_hash, code_display, classes_json) VALUES (?, ?, ?, ?)')
+    .run(name, hash, code, JSON.stringify(normClasses));
 }
 
 async function remove(id) {
-  await pool.query('DELETE FROM teachers WHERE id = $1', [id]);
+  db.prepare('DELETE FROM teachers WHERE id = ?').run(id);
 }
 
 module.exports = { listAll, findByCode, codeExists, create, remove };
